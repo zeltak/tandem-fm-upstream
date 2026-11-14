@@ -3335,7 +3335,14 @@ void MainWindow::fillBookmarksMenu(QMenu* menu)
     static const QIcon folder = IconCache::themed("folder");
     static const QIcon pin = IconCache::themed("pin", "emblem-favorite");
     auto entry = [&](const QString& path, const QString& key, const QIcon& icon) {
-        QAction* a = add(menu->addAction(icon, key.isEmpty() ? label(path) : label(path) + QLatin1Char('\t') + key));
+#ifdef Q_OS_MACOS
+        // The menu bar there turns text after a tab into a real shortcut:
+        // a bookmark keyed "up" would take the Up arrow.
+        const QString text = key.isEmpty() ? label(path) : QStringLiteral("%1   (%2)").arg(label(path), key);
+#else
+        const QString text = key.isEmpty() ? label(path) : label(path) + QLatin1Char('\t') + key;
+#endif
+        QAction* a = add(menu->addAction(icon, text));
         a->setToolTip(path);
         a->setStatusTip(path);
         connect(a, &QAction::triggered, this, [this, path] { active()->navigate(path); });

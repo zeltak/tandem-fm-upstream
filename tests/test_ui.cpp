@@ -688,7 +688,7 @@ private slots:
         QVERIFY(qEnvironmentVariableIsEmpty("QT_SCALE_FACTOR"));
     }
 
-    // The Bookmarks menu lists bookmarks (keys on the right) and pins; a click goes there.
+    // The Bookmarks menu lists bookmarks with their keys, and pins; a click goes there.
     void bookmarksMenu()
     {
         FolderHistory& h = FolderHistory::instance();
@@ -699,6 +699,12 @@ private slots:
             h.setPinned(L("sub"), false);
             h.setPinned(R(), false);
         });
+#ifdef Q_OS_MACOS
+        // Text after a tab would become a real shortcut in the macOS menu bar.
+        const QString subText = "sub   (zs)";
+#else
+        const QString subText = "sub\tzs";
+#endif
         QMenu* menu = nullptr;
         for (QAction* a : m_window->menuBar()->actions())
             if (a->menu() && a->text().remove('&') == "Bookmarks")
@@ -708,22 +714,26 @@ private slots:
         QAction* sub = nullptr;
         bool pinned = false;
         for (QAction* a : menu->actions()) {
-            if (a->text() == "sub\tzs")
+            if (a->text() == subText)
                 sub = a;
             pinned |= a->text() == baseName(R());
         }
         QVERIFY(sub);
         QVERIFY(pinned);
+#ifdef Q_OS_MACOS
+        for (QAction* a : menu->actions())
+            QVERIFY2(!a->text().contains('\t'), qPrintable(a->text()));
+#endif
         emit menu->aboutToShow();  // filled anew, not twice
         int count = 0;
         for (QAction* a : menu->actions())
-            count += a->text() == "sub\tzs";
+            count += a->text() == subText;
         QCOMPARE(count, 1);
         m_left->navigate(L());
         QTRY_COMPARE(leftModel()->path(), L());
         m_left->view()->setFocus();
         for (QAction* a : menu->actions())
-            if (a->text() == "sub\tzs")
+            if (a->text() == subText)
                 a->trigger();
         QTRY_COMPARE(leftModel()->path(), L("sub"));
         m_left->navigate(L());
