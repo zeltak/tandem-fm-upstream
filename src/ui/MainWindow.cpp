@@ -208,6 +208,10 @@ MainWindow::MainWindow(const QStringList& startPaths)
 
     for (Panel* p : {m_left, m_right}) {
         connect(p, &Panel::activated, this, &MainWindow::setActive);
+        connect(p, &Panel::stateChanged, this, [this, p] {
+            if (m_foldersFirstAction && p == active())
+                m_foldersFirstAction->setChecked(p->sortSpec().foldersFirst);
+        });
         connect(p, &Panel::switchRequested, this, [this] {
             other()->view()->setFocus();
         });
@@ -314,6 +318,8 @@ void MainWindow::setActive(Panel* p)
     m_active = p;
     m_left->setActive(p == m_left);
     m_right->setActive(p == m_right);
+    if (m_foldersFirstAction)
+        m_foldersFirstAction->setChecked(p->sortSpec().foldersFirst);
     scheduleFKeyUpdate();
     if (m_quickView)
         m_quickTimer->start();
@@ -492,6 +498,17 @@ void MainWindow::createMenus()
     m_actions[QStringLiteral("sortExt")] = addCommand(sort, QT_TR_NOOP("Sort by extension"), {K(Qt::CTRL | Qt::Key_F4)}, [this] { active()->sortBy(SortColumn::Ext); });
     m_actions[QStringLiteral("sortDate")] = addCommand(sort, QT_TR_NOOP("Sort by date"), {K(Qt::CTRL | Qt::Key_F5)}, [this] { active()->sortBy(SortColumn::Time); });
     m_actions[QStringLiteral("sortSize")] = addCommand(sort, QT_TR_NOOP("Sort by size"), {K(Qt::CTRL | Qt::Key_F6)}, [this] { active()->sortBy(SortColumn::Size); });
+    sort->addSeparator();
+    m_foldersFirstAction = addCommand(sort, QT_TR_NOOP("Folders first"), {}, [this] {
+        SortSpec spec = active()->sortSpec();
+        spec.foldersFirst = !spec.foldersFirst;
+        active()->setSortSpec(spec);
+        m_foldersFirstAction->setChecked(spec.foldersFirst);
+    });
+    m_foldersFirstAction->setCheckable(true);
+    m_foldersFirstAction->setChecked(true);
+    connect(sort, &QMenu::aboutToShow, this,
+            [this] { m_foldersFirstAction->setChecked(active()->sortSpec().foldersFirst); });
     for (QAction* a : sort->actions())
         a->setProperty("category", tr("View"));  // for the palette and keys page
     view->addSeparator();
@@ -3861,6 +3878,7 @@ void MainWindow::loadSettings(const QStringList& startPaths)
         SortSpec spec;
         spec.column = SortColumn(s.value(QStringLiteral("sortColumn"), 0).toInt());
         spec.descending = s.value(QStringLiteral("sortDescending"), false).toBool();
+        spec.foldersFirst = s.value(QStringLiteral("foldersFirst"), true).toBool();
         p.panel->setSortSpec(spec);
         p.panel->setShowHidden(hidden);
         // Columns by name; older versions kept Qt's header state, read once.
@@ -3968,6 +3986,7 @@ void MainWindow::saveSettings()
         s.setValue(QStringLiteral("tabPins"), pins);
         s.setValue(QStringLiteral("sortColumn"), int(panel->sortSpec().column));
         s.setValue(QStringLiteral("sortDescending"), panel->sortSpec().descending);
+        s.setValue(QStringLiteral("foldersFirst"), panel->sortSpec().foldersFirst);
         s.setValue(QStringLiteral("columns"), panel->columnLayout());
         s.remove(QStringLiteral("header"));  // older versions
         s.endGroup();

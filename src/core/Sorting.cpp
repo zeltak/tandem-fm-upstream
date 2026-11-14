@@ -81,7 +81,7 @@ bool entryLess(const FileEntry& a, const FileEntry& b, const SortSpec& spec)
 {
     if (a.isParent != b.isParent)
         return a.isParent;
-    if (a.isDir != b.isDir)
+    if (spec.foldersFirst && a.isDir != b.isDir)
         return a.isDir;
 
     int c = 0;
@@ -89,8 +89,8 @@ bool entryLess(const FileEntry& a, const FileEntry& b, const SortSpec& spec)
     case SortColumn::Name:
         break;
     case SortColumn::Ext:
-        if (!a.isDir)
-            c = extensionOf(a.name).compare(extensionOf(b.name), Qt::CaseInsensitive);
+        c = (a.isDir ? QStringView{} : extensionOf(a.name))
+                .compare(b.isDir ? QStringView{} : extensionOf(b.name), Qt::CaseInsensitive);
         break;
     case SortColumn::Size:
         c = cmp(a.size, b.size);

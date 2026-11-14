@@ -2606,6 +2606,10 @@
         <translation>Arbeitsbereich öffnen</translation>
     </message>
     <message>
+        <source>Folders first</source>
+        <translation>Ordner zuerst</translation>
+    </message>
+    <message>
         <source>Preview: details instead of content</source>
         <translation>Vorschau: Details statt Inhalt</translation>
     </message>

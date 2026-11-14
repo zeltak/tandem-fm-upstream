@@ -203,6 +203,7 @@ private:
     JobManager* m_jobs;
     JobsPanel* m_jobsPanel;
     QAction* m_hiddenAction = nullptr;
+    QAction* m_foldersFirstAction = nullptr;
     QHash<QString, QAction*> m_actions;
     FuzzyPopup* m_popup = nullptr;
     KeyChordPopup* m_chords = nullptr;

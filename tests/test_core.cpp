@@ -112,6 +112,40 @@ private slots:
         QCOMPARE(names, QStringList({"..", "A-dir", "b-dir", "file1", "File2", "file10"}));
     }
 
+    void mixedFolderSort()
+    {
+        std::vector<FileEntry> entries = {entry("z-folder", true), entry("file10.txt"), entry("File2.txt"),
+                                         entry("a.txt"), entry("b-folder", true)};
+        FileEntry parent = entry("..", true);
+        parent.isParent = true;
+        entries.push_back(parent);
+        auto names = [&] {
+            QStringList result;
+            for (const auto& e : entries)
+                result << e.name;
+            return result;
+        };
+        sortEntries(entries, {SortColumn::Name, false, false});
+        QCOMPARE(names(), QStringList({"..", "a.txt", "b-folder", "File2.txt", "file10.txt", "z-folder"}));
+        sortEntries(entries, {SortColumn::Name, true, false});
+        QCOMPARE(names(), QStringList({"..", "z-folder", "file10.txt", "File2.txt", "b-folder", "a.txt"}));
+        sortEntries(entries, {SortColumn::Name, false});
+        QCOMPARE(names(), QStringList({"..", "b-folder", "z-folder", "a.txt", "File2.txt", "file10.txt"}));
+
+        // Mixed extension sorting must be symmetric: folders have no extension.
+        entries = {entry("z.txt", true), entry("a.zip"), entry("b.txt"), entry("b", true), entry("a")};
+        const SortSpec spec{SortColumn::Ext, false, false};
+        for (const auto& a : entries)
+            for (const auto& b : entries) {
+                QVERIFY(!(entryLess(a, b, spec) && entryLess(b, a, spec)));
+                for (const auto& c : entries)
+                    if (entryLess(a, b, spec) && entryLess(b, c, spec))
+                        QVERIFY(entryLess(a, c, spec));
+            }
+        sortEntries(entries, spec);
+        QCOMPARE(names(), QStringList({"a", "b", "z.txt", "b.txt", "a.zip"}));
+    }
+
     void extension()
     {
         QCOMPARE(extensionOf("archive.tar.gz").toString(), QString("tar.gz"));

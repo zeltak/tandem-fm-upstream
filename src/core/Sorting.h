@@ -17,6 +17,7 @@ enum class SortColumn : uint8_t {
 struct SortSpec {
     SortColumn column = SortColumn::Name;
     bool descending = false;
+    bool foldersFirst = true;
     bool operator==(const SortSpec&) const = default;
 };
 
@@ -28,7 +29,7 @@ QCollatorSortKey makeSortKey(const QString& name);
 // tarballs keep both parts ("tar.gz").
 QStringView extensionOf(const QString& name);
 
-// Directories (and "..") always come first; ".." is always the very first row.
+// Directories come first by default; ".." is always the very first row.
 bool entryLess(const FileEntry& a, const FileEntry& b, const SortSpec& spec);
 void sortEntries(std::vector<FileEntry>& entries, const SortSpec& spec);
 

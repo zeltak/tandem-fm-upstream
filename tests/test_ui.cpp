@@ -256,6 +256,39 @@ private slots:
         QCOMPARE(names, QStringList({"..", "sub", "file1.txt", "file2.txt", "file10.txt", "photo.jpg"}));
     }
 
+    void foldersFirstOption()
+    {
+        const SortSpec original = m_left->sortSpec();
+        auto restore = qScopeGuard([&] {
+            m_left->setSortSpec(original);
+            m_left->view()->setFocus();
+        });
+        m_left->setSortSpec({SortColumn::Name, false});
+        QAction* option = nullptr;
+        for (auto* a : m_window->findChildren<QAction*>())
+            if (a->property("commandId").toString() == "folders-first")
+                option = a;
+        QVERIFY(option);
+        QVERIFY(option->isCheckable());
+        option->trigger();
+        QVERIFY(!m_left->sortSpec().foldersFirst);
+        QVERIFY(m_right->sortSpec().foldersFirst);
+        QVERIFY(!option->isChecked());
+        QStringList names;
+        for (int row = 0; row < leftModel()->count(); ++row)
+            names << leftModel()->entry(row)->name;
+        QCOMPARE(names, QStringList({"..", "file1.txt", "file2.txt", "file10.txt", "photo.jpg", "sub"}));
+        m_right->view()->setFocus();
+        QTRY_VERIFY(m_right->isActive());
+        QVERIFY(option->isChecked());
+        m_left->view()->setFocus();
+        QTRY_VERIFY(m_left->isActive());
+        QVERIFY(!option->isChecked());
+        option->trigger();
+        QVERIFY(m_left->sortSpec().foldersFirst);
+        QCOMPARE(leftModel()->entry(1)->name, QString("sub"));
+    }
+
     void enterAndLeaveFolder()
     {
         moveCursorTo(m_left, "sub");
