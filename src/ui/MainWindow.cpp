@@ -512,6 +512,17 @@ void MainWindow::createMenus()
     for (QAction* a : sort->actions())
         a->setProperty("category", tr("View"));  // for the palette and keys page
     view->addSeparator();
+    addCommand(view, tr("Equal panel widths (50/50)"), {}, [this] {
+        m_panelRatio = 0.5;  // setSizes does not emit splitterMoved
+        QList<int> sizes = m_splitter->sizes();
+        if (sizes.size() < 2)
+            return;
+        const int total = qMax(2, sizes[0] + sizes[1]);
+        sizes[0] = total / 2;
+        sizes[1] = total - sizes[0];
+        // Keep a right-side preview at its current width.
+        m_splitter->setSizes(sizes);
+    }, QStringLiteral("equal-panel-widths"));
     m_hiddenAction = addCommand(view, QT_TR_NOOP("Show hidden files"), {K(Qt::CTRL | Qt::Key_H)}, [this] {
         m_left->setShowHidden(m_hiddenAction->isChecked());
         m_right->setShowHidden(m_hiddenAction->isChecked());

@@ -32,6 +32,11 @@ Window size, columns and open tabs are Tandem's own business and live in
 (`tandem-fm.conf`) move over on the first start; the old file stays as
 `tandem-fm.conf.bak`.
 
+**View → Equal panel widths (50/50)** restores an equal split between the
+left and right file panels. A preview on the right keeps its current width.
+The command is also in the command palette and on the Keys page, where you
+can assign a shortcut. It has no default key binding.
+
 ## Startup and workspaces
 
 A workspace is the tabs of both panels under a name. **Alt+W** opens one in

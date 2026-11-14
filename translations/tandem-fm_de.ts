@@ -2610,6 +2610,10 @@
         <translation>Ordner zuerst</translation>
     </message>
     <message>
+        <source>Equal panel widths (50/50)</source>
+        <translation>Gleiche Panelbreiten (50/50)</translation>
+    </message>
+    <message>
         <source>Preview: details instead of content</source>
         <translation>Vorschau: Details statt Inhalt</translation>
     </message>

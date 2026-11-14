@@ -289,6 +289,27 @@ private slots:
         QCOMPARE(leftModel()->entry(1)->name, QString("sub"));
     }
 
+    // View › Equal panel widths splits the two file panels evenly.
+    void equalPanelWidths()
+    {
+        auto* split = qobject_cast<QSplitter*>(m_left->parentWidget()->parentWidget());
+        QVERIFY(split);
+        const QList<int> before = split->sizes();
+        auto restore = qScopeGuard([&] { split->setSizes(before); });
+        QList<int> sizes = before;
+        const int total = sizes[0] + sizes[1];
+        sizes[0] = total / 3;
+        sizes[1] = total - sizes[0];
+        split->setSizes(sizes);
+        QAction* equal = nullptr;
+        for (QAction* a : m_window->actions())
+            if (a->property("commandId").toString() == "equal-panel-widths")
+                equal = a;
+        QVERIFY(equal);
+        equal->trigger();
+        QVERIFY(qAbs(split->sizes()[0] - split->sizes()[1]) <= 1);
+    }
+
     void enterAndLeaveFolder()
     {
         moveCursorTo(m_left, "sub");
