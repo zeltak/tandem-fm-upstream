@@ -1247,6 +1247,19 @@ private slots:
         QCOMPARE(h.items().size(), 1);
         QVERIFY(FolderHistory::frecency(10, 0, 30) > FolderHistory::frecency(10, 0, 30 * 86400));
 
+        // Notifications arrive after unlocking, and include plain favourites.
+        QSignalSpy changed(&h, &FolderHistory::bookmarksChanged);
+        bool unlocked = false;
+        const auto connection = connect(&h, &FolderHistory::bookmarksChanged, &h, [&] {
+            unlocked = !h.pinnedBookmarks().isEmpty();
+        });
+        h.setBookmark("/plain", {});
+        QCOMPARE(changed.size(), 1);
+        QVERIFY(unlocked);
+        QCOMPARE(h.pinnedBookmarks().last().path, QString("/plain"));
+        QVERIFY(h.pinnedBookmarks().last().key.isEmpty());
+        disconnect(connection);
+
         // Bookmarks: unique keys, chains, persistence.
         h.setBookmark("/proj", "cp");
         h.setBookmark("/docs", "cd");
@@ -1260,6 +1273,8 @@ private slots:
         h.loadAsync();
         QTRY_COMPARE(h.pathForKey("cd"), QString("/docs"));
         QCOMPARE(h.bookmarks().size(), 2);
+        QVERIFY(h.isPinned("/plain"));
+        QVERIFY(h.bookmarkKey("/plain").isEmpty());
         h.setPinned("/docs", false);    // unpinning drops the key
         QCOMPARE(h.pathForKey("cd"), QString());
 

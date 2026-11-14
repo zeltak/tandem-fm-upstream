@@ -1375,6 +1375,85 @@
     </message>
 </context>
 <context>
+    <name>tandem::BookmarkSettings</name>
+    <message>
+        <source>Find a favourite or key</source>
+        <translation>Favoriten oder Taste suchen</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>Ordner</translation>
+    </message>
+    <message>
+        <source>Bookmark keys</source>
+        <translation>Lesezeichentasten</translation>
+    </message>
+    <message>
+        <source>Full modal chain</source>
+        <translation>Vollständige modale Tastenfolge</translation>
+    </message>
+    <message>
+        <source>Bookmark keys:</source>
+        <translation>Lesezeichentasten:</translation>
+    </message>
+    <message>
+        <source>One character per step, for example: w s</source>
+        <translation>Ein Zeichen pro Schritt, zum Beispiel: w s</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation>Anwenden</translation>
+    </message>
+    <message>
+        <source>Add current folder</source>
+        <translation>Aktuellen Ordner hinzufügen</translation>
+    </message>
+    <message>
+        <source>Clear key</source>
+        <translation>Taste entfernen</translation>
+    </message>
+    <message>
+        <source>Remove favourite</source>
+        <translation>Favoriten entfernen</translation>
+    </message>
+    <message>
+        <source>Pick a favourite to edit its bookmark keys. Clearing a key keeps the favourite.</source>
+        <translation>Wähle einen Favoriten, um seine Lesezeichentasten zu ändern. Wenn du die Taste entfernst, bleibt der Favorit erhalten.</translation>
+    </message>
+    <message>
+        <source>Loading…</source>
+        <translation>Wird geladen…</translation>
+    </message>
+    <message>
+        <source>Use single characters separated by spaces, for example: w s.</source>
+        <translation>Verwende einzelne Zeichen mit Leerzeichen dazwischen, zum Beispiel: w s.</translation>
+    </message>
+    <message>
+        <source>The modal bookmark prefix is disabled. These keys still work in the Bookmarks popup.</source>
+        <translation>Das modale Lesezeichenpräfix ist deaktiviert. Diese Tasten funktionieren weiterhin im Lesezeichenfenster.</translation>
+    </message>
+    <message>
+        <source>Full modal chain: %1. Enter only the bookmark keys above, without the prefix %2.</source>
+        <translation>Vollständige modale Tastenfolge: %1. Gib oben nur die Lesezeichentasten ein, ohne das Präfix %2.</translation>
+    </message>
+    <message>
+        <source>This modal chain conflicts with %1. Change the bookmark keys or that command&apos;s modal keys.</source>
+        <translation>Diese modale Tastenfolge überschneidet sich mit %1. Ändere die Lesezeichentasten oder die modalen Tasten dieses Befehls.</translation>
+    </message>
+    <message>
+        <source>Applying moves this key from %1. That folder stays a favourite.</source>
+        <translation>Beim Anwenden wird diese Taste von %1 übernommen. Dieser Ordner bleibt ein Favorit.</translation>
+    </message>
+    <message>
+        <source>Press Enter after this chain to choose it instead of a longer bookmark chain.</source>
+        <translation>Drücke nach dieser Tastenfolge die Eingabetaste, um sie statt einer längeren Lesezeichenfolge zu wählen.</translation>
+    </message>
+    <message>
+        <source>Clearing a key keeps the favourite.</source>
+        <translation>Wenn du die Taste entfernst, bleibt der Favorit erhalten.</translation>
+    </message>
+</context>
+<context>
     <name>tandem::ChecksumDialog</name>
     <message>
         <source>Check checksums</source>
@@ -2588,6 +2667,10 @@
     <message>
         <source>&amp;Bookmarks</source>
         <translation>&amp;Lesezeichen</translation>
+    </message>
+    <message>
+        <source>Manage bookmarks…</source>
+        <translation>Lesezeichen verwalten…</translation>
     </message>
     <message>
         <source>Pin or unpin tab</source>
@@ -5093,6 +5176,10 @@ sftp und smb sind eingebaut; die anderen werden mit GVfs eingehängt (andere Pro
     <message>
         <source>Startup</source>
         <translation>Start</translation>
+    </message>
+    <message>
+        <source>Bookmarks</source>
+        <translation>Lesezeichen</translation>
     </message>
     <message>
         <source>Font</source>

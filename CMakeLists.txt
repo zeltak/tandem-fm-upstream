@@ -102,6 +102,7 @@ add_library(tandem_ui STATIC
   src/ui/PermissionsDialog.h src/ui/PermissionsDialog.cpp
   src/ui/AboutDialog.h src/ui/AboutDialog.cpp
   src/ui/ShortcutsDialog.h src/ui/ShortcutsDialog.cpp
+  src/ui/BookmarkSettings.h src/ui/BookmarkSettings.cpp
   src/ui/SettingsDialog.h src/ui/SettingsDialog.cpp
   src/ui/TrashDialog.h src/ui/TrashDialog.cpp
   src/ui/DuplicatesDialog.h src/ui/DuplicatesDialog.cpp

@@ -137,6 +137,13 @@ Gruvbox, Catppuccin, Solarized, Tokyo Night and others. It can follow your
 desktop's light/dark preference. Custom themes are JSON files; optional
 file-type colours come from the theme too.
 
+Settings → Bookmarks lists all favourites, including those without a key. Pick a
+folder to edit its bookmark keys, one character per step (`w s`). The full modal
+chain includes the bookmark prefix (normally `g w s`). Clearing a key keeps the
+favourite; removing a favourite also removes its key. Assigning a key already in
+use moves it to the selected favourite. Changes use the existing `folders.tsv`
+and are saved across restarts.
+
 Settings and key bindings live in readable TOML files. The settings dialog
 preserves your comments when changing values, and saved key bindings reload
 without restarting. Use `--config-dir` to keep settings, keys, open tabs,

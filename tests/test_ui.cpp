@@ -730,6 +730,92 @@ private slots:
         QTRY_COMPARE(leftModel()->path(), L());
     }
 
+    void bookmarkSettings()
+    {
+        auto& history = FolderHistory::instance();
+        QTRY_VERIFY(history.isLoaded());
+        const auto original = history.pinnedBookmarks();
+        auto restore = qScopeGuard([&] {
+            for (const auto& pin : history.pinnedBookmarks())
+                history.setPinned(pin.path, false);
+            for (const auto& pin : original)
+                history.setBookmark(pin.path, pin.key);
+            m_left->setVimKeys(false);
+            m_left->navigate(L());
+        });
+        history.setBookmark(L("sub"), "ws");
+        history.setPinned(R(), true);
+        SettingsDialog dialog(m_window.get());
+        dialog.showPage(6);
+        dialog.show();
+        auto* list = dialog.findChild<QTreeWidget*>("bookmarkList");
+        auto* edit = dialog.findChild<QLineEdit*>("bookmarkKeys");
+        auto* note = dialog.findChild<QLabel*>("bookmarkNote");
+        auto* apply = dialog.findChild<QPushButton*>("bookmarkApply");
+        auto* clear = dialog.findChild<QPushButton*>("bookmarkClear");
+        auto* remove = dialog.findChild<QPushButton*>("bookmarkRemove");
+        auto* filter = dialog.findChild<QLineEdit*>("bookmarkFilter");
+        QVERIFY(list && edit && note && apply && clear && remove && filter);
+        auto pick = [&](const QString& path) {
+            for (int i = 0; i < list->topLevelItemCount(); ++i)
+                if (list->topLevelItem(i)->text(0) == path) {
+                    list->setCurrentItem(list->topLevelItem(i));
+                    return true;
+                }
+            return false;
+        };
+        QVERIFY(pick(L("sub")));
+        QCOMPARE(edit->text(), QString("w s"));
+        QCOMPARE(list->currentItem()->text(2), QString("g w s"));
+        edit->setText("Ctrl+X");
+        QVERIFY(!apply->isEnabled());
+        edit->setText("g");  // g g belongs to the modal Top command
+        QVERIFY(note->text().contains("conflicts"));
+        edit->setText("w d");
+        history.setPinned(L("sub/deep"), true);  // live updates preserve unfinished edits
+        QCOMPARE(edit->text(), QString("w d"));
+        edit->setFocus();
+        QTest::keyClick(edit, Qt::Key_Return);
+        QCOMPARE(history.bookmarkKey(L("sub")), QString("wd"));
+        QVERIFY(dialog.isVisible());  // Enter applies without closing Settings
+        QVERIFY(pick(R()));
+        QVERIFY(edit->text().isEmpty());
+        edit->setText("w d");
+        QVERIFY(note->text().contains(L("sub")));
+        QTest::mouseClick(apply, Qt::LeftButton);
+        QCOMPARE(history.bookmarkKey(R()), QString("wd"));
+        QVERIFY(history.isPinned(L("sub")));
+        QVERIFY(history.bookmarkKey(L("sub")).isEmpty());
+        QTest::mouseClick(clear, Qt::LeftButton);
+        QVERIFY(history.isPinned(R()));
+        QVERIFY(history.bookmarkKey(R()).isEmpty());
+        edit->setText("w s");
+        QTest::mouseClick(apply, Qt::LeftButton);
+        filter->setText("g w s");
+        QCOMPARE(list->topLevelItemCount(), 1);
+        QCOMPARE(list->topLevelItem(0)->text(0), R());
+        filter->clear();
+        QVERIFY(pick(L("sub/deep")));
+        QTest::mouseClick(remove, Qt::LeftButton);
+        QVERIFY(!history.isPinned(L("sub/deep")));
+        // Measured when filled, never while the header paints: that crashed on macOS.
+        for (int column = 0; column < list->columnCount(); ++column)
+            QVERIFY(list->header()->sectionResizeMode(column) != QHeaderView::ResizeToContents);
+        QVERIFY(list->columnWidth(1) > 0);
+        QApplication::processEvents();  // repaint the shorter list
+        dialog.close();
+        // The keys configured in Settings invoke the favourite in modal mode.
+        m_left->navigate(L());
+        QTRY_COMPARE(leftModel()->path(), L());
+        m_left->setVimKeys(true);
+        m_left->view()->setFocus();
+        QTest::keyClicks(m_left->view(), "gw");
+        auto* chords = m_window->findChild<KeyChordPopup*>();
+        QTRY_VERIFY(chords->isVisible());
+        QTest::keyClicks(chords, "s");
+        QTRY_COMPARE(leftModel()->path(), R());
+    }
+
     // Rows: dates people read at a glance, folders with item counts, no Ext/Attributes columns.
     void rowsAtAGlance()
     {

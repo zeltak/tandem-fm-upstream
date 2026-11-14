@@ -54,6 +54,9 @@ void FolderHistory::setStoragePath(const QString& path)
     m_entries.clear();
     m_pinned.clear();
     m_keys.clear();
+    m_loaded.store(false);
+    lock.unlock();
+    emit bookmarksChanged();
 }
 
 double FolderHistory::frecency(double count, qint64 lastVisit, qint64 now)
@@ -124,6 +127,8 @@ void FolderHistory::load()
         if (!m_keys.contains(it.key()) && pathForKeyLocked(it.value()).isEmpty())
             m_keys.insert(it.key(), it.value());
     m_loaded.store(true);
+    lock.unlock();
+    emit bookmarksChanged();
 }
 
 void FolderHistory::saveNow()
@@ -206,6 +211,7 @@ void FolderHistory::forget(const QString& path)
         m_pinned.removeAll(path);
         m_keys.remove(path);
     }
+    emit bookmarksChanged();
     scheduleSave();
 }
 
@@ -219,6 +225,7 @@ void FolderHistory::setPinned(const QString& path, bool pinned)
         else
             m_keys.remove(path);
     }
+    emit bookmarksChanged();
     scheduleSave();
 }
 
@@ -245,6 +252,7 @@ void FolderHistory::setBookmark(const QString& path, const QString& key)
         if (!m_pinned.contains(path))
             m_pinned.append(path);
     }
+    emit bookmarksChanged();
     scheduleSave();
 }
 
@@ -267,6 +275,16 @@ QList<FolderHistory::Bookmark> FolderHistory::bookmarks() const
     for (auto it = m_keys.cbegin(); it != m_keys.cend(); ++it)
         out.append({it.value(), it.key()});
     std::sort(out.begin(), out.end(), [](const Bookmark& a, const Bookmark& b) { return a.key < b.key; });
+    return out;
+}
+
+QList<FolderHistory::Bookmark> FolderHistory::pinnedBookmarks() const
+{
+    QMutexLocker lock(&m_mutex);
+    QList<Bookmark> out;
+    out.reserve(m_pinned.size());
+    for (const QString& path : m_pinned)
+        out.append({m_keys.value(path), path});
     return out;
 }
 

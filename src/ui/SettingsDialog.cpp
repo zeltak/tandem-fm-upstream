@@ -1,4 +1,5 @@
 #include "ui/SettingsDialog.h"
+#include "ui/BookmarkSettings.h"
 #include "ui/OpenUrl.h"
 
 #include "ui/Keymap.h"
@@ -251,6 +252,7 @@ SettingsDialog::SettingsDialog(MainWindow* window) : QDialog(window), m_window(w
         {tr("Tools"), QStringLiteral("applications-utilities")},
         {tr("Keys"), QStringLiteral("preferences-desktop-keyboard")},
         {tr("Plugins"), QStringLiteral("preferences-plugin")},
+        {tr("Bookmarks"), QStringLiteral("user-bookmarks")},
     };
     for (const auto& [name, icon] : pages)
         new QListWidgetItem(IconCache::themed(icon.toUtf8().constData(), "preferences-system"), name, m_nav);
@@ -262,6 +264,7 @@ SettingsDialog::SettingsDialog(MainWindow* window) : QDialog(window), m_window(w
     m_pages->addWidget(toolsPage());
     m_pages->addWidget(keysPage());
     m_pages->addWidget(pluginsPage());
+    m_pages->addWidget(new BookmarkSettings(this, [this] { return m_window->active()->path(); }));
     body->addWidget(m_pages, 1);
     outer->addLayout(body, 1);
     connect(m_nav, &QListWidget::currentRowChanged, m_pages, &QStackedWidget::setCurrentIndex);

@@ -3,6 +3,7 @@
 #include <QHash>
 #include <QList>
 #include <QMutex>
+#include <QObject>
 #include <QString>
 #include <QStringList>
 
@@ -13,7 +14,8 @@ namespace tandem {
 // Folders you visit, ranked by "frecency" (zoxide-style: visit count weighted
 // by how recently), plus pinned folders (the hotlist). Thread-safe. Stored in
 // $XDG_DATA_HOME/tandem-fm/folders.tsv; saving happens off the UI thread.
-class FolderHistory {
+class FolderHistory : public QObject {
+    Q_OBJECT
 public:
     struct Item {
         QString path;
@@ -42,11 +44,15 @@ public:
     QString bookmarkKey(const QString& path) const;
     QString pathForKey(const QString& key) const;
     QList<Bookmark> bookmarks() const;  // with keys, sorted by key
+    QList<Bookmark> pinnedBookmarks() const;  // all favourites, including those without keys
     QList<Item> items() const;  // pinned first (in pin order), then by frecency
 
     static double frecency(double count, qint64 lastVisit, qint64 now);
     QString storagePath() const;
     void setStoragePath(const QString& path);  // tests
+
+signals:
+    void bookmarksChanged();
 
 private:
     FolderHistory() = default;

@@ -23,7 +23,7 @@ class SettingsDialog : public QDialog {
 public:
     explicit SettingsDialog(MainWindow* window);
 
-    void showPage(int index);  // 0 appearance, 1 behaviour, 2 startup, 3 tools, 4 keys, 5 plugins
+    void showPage(int index);  // 0 appearance, 1 behaviour, 2 startup, 3 tools, 4 keys, 5 plugins, 6 bookmarks
     // For tests.
     QTreeWidget* keyList() const { return m_keys; }
     QKeySequenceEdit* keyEdit() const { return m_keyEdit; }
